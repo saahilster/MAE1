@@ -14,6 +14,7 @@
 #include "esp_check.h"
 #include "esp_err.h"
 #include "esp_vfs_fat.h"
+#include "dirent.h"
 
 
 #define MOUNT_POINT "/sdcard"
@@ -24,23 +25,17 @@
 #define CLK_GPIO 12
 #define MISO_GPIO 13
 
+//For playlists
+char trackList[16][64];
+int trackCount = 0;
+
+//For songs
+char songList[50][64];
+int songCount = 0;
+
 //Function will initialize SPI bus along with SDSPI.
 void initialize(){
     esp_err_t ret;
-
-    // Deassert CS and let the card power stabilize
-    gpio_config_t cs_conf = {
-        .pin_bit_mask = (1ULL << CS_GPIO),
-        .mode         = GPIO_MODE_OUTPUT,
-        .pull_up_en   = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type    = GPIO_INTR_DISABLE,
-    };
-
-    gpio_config(&cs_conf);
-    gpio_set_level(CS_GPIO, 1);
-    vTaskDelay(pdMS_TO_TICKS(100));
-
 
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
     // Don't override max_freq_khz — let it use the default
@@ -103,4 +98,61 @@ void initialize(){
     printf("SD card mounted successfully at %s\n", MOUNT_POINT);
     sdmmc_card_print_info(stdout, card);
 
+}
+
+void list_trackslist(){
+    DIR *dir = opendir(MOUNT_POINT);
+    
+    if (dir == NULL) {
+        printf("directory null -> mount failure");
+        return;
+    }
+    struct dirent *entry;
+
+    while ((entry = readdir(dir)) != NULL){
+        if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0){
+            continue;
+        }
+        strcpy(trackList[trackCount], entry->d_name);
+        trackCount++;
+        
+        // printf("%s\n", entry->d_name);
+    }
+
+    for(int i = 0; i < trackCount; i++){
+        printf("%s copied into playlists\n", tracks[i]);
+    }
+}
+
+void seek_track(const char *trackName){
+    char path[70] = MOUNT_POINT;
+    strcat(path, trackName);
+
+    DIR *dir = opendir(path);
+    if (trackName == NULL){
+        printf("Track could not be found");
+        return;
+    }
+
+    struct dirent *entry;
+
+    while ((entry = readdir(dir)) != NULL){
+        if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0){
+            continue;
+        }
+        printf("%s\n", entry->d_name);
+    }
+}
+
+void clear_songs(void){
+    songCount = 0;
+}
+
+void select_song(const char *song){
+
+}
+
+void run(){
+    list_tracklist();
+    seek_track("/Disc 1");
 }

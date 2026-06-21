@@ -7,4 +7,5 @@
 void app_main(void)
 {
     initialize();
+    run();
 }

@@ -1,7 +1,7 @@
 {
     "version":            "1.3",
     "project_name":       "proj",
-    "project_version":    "50f8085",
+    "project_version":    "a6e1383-dirty",
     "project_path":       "C:/PROJECTS/MAE1/proj",
     "idf_path":           "C:/esp/v6.0.1/esp-idf",
     "build_dir":          "C:/PROJECTS/MAE1/proj/build",
