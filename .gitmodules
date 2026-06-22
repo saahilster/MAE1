@@ -1,0 +1,3 @@
+[submodule "proj/components/micro-flac"]
+	path = proj/components/micro-flac
+	url = https://github.com/esphome-libs/micro-flac.git
