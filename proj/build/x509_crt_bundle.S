@@ -1,4 +1,4 @@
-/* * Data converted from C:/PROJECTS/MAE1/proj/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from C:/Projects/MAE1/proj/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 #if !defined (__APPLE__) && !defined (__linux__)

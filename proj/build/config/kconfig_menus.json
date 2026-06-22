@@ -35974,6 +35974,84 @@
                 "type": "menu"
             },
             {
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "children": [],
+                                "depends_on": "SPIRAM && <choice MICRO_FLAC_MEMORY_PREFERENCE>",
+                                "help": "Try to allocate from PSRAM first. If unavailable, fall back\nto internal RAM. Recommended for most use cases.",
+                                "id": "MICRO_FLAC_PREFER_PSRAM",
+                                "name": "MICRO_FLAC_PREFER_PSRAM",
+                                "range": null,
+                                "title": "Prefer PSRAM, fall back to internal RAM",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "SPIRAM && <choice MICRO_FLAC_MEMORY_PREFERENCE>",
+                                "help": "Try to allocate from internal RAM first. Better performance\nbut uses precious internal RAM.",
+                                "id": "MICRO_FLAC_PREFER_INTERNAL",
+                                "name": "MICRO_FLAC_PREFER_INTERNAL",
+                                "range": null,
+                                "title": "Prefer internal RAM, fall back to PSRAM",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "SPIRAM && <choice MICRO_FLAC_MEMORY_PREFERENCE>",
+                                "help": "Only allocate from PSRAM. Allocation will fail if PSRAM is\nnot available. Use when internal RAM must be reserved for\nother components.",
+                                "id": "MICRO_FLAC_PSRAM_ONLY",
+                                "name": "MICRO_FLAC_PSRAM_ONLY",
+                                "range": null,
+                                "title": "PSRAM only (fail if unavailable)",
+                                "type": "bool"
+                            },
+                            {
+                                "children": [],
+                                "depends_on": "<choice MICRO_FLAC_MEMORY_PREFERENCE>",
+                                "help": "Only allocate from internal RAM. Ignores PSRAM even if\navailable. Best performance but highest internal RAM usage.",
+                                "id": "MICRO_FLAC_INTERNAL_ONLY",
+                                "name": "MICRO_FLAC_INTERNAL_ONLY",
+                                "range": null,
+                                "title": "Internal RAM only",
+                                "type": "bool"
+                            }
+                        ],
+                        "depends_on": null,
+                        "help": "Choose memory allocation preference for FLAC decoder buffers.\n\nThe decoder allocates a working buffer based on max_block_size\nfrom STREAMINFO (typically 16-64KB for stereo). This setting\ncontrols where that buffer is allocated.",
+                        "id": "component-config-microflac-decoder-memory-allocation-preference-C:-Projects-MAE1-proj-components-micro-flac-Kconfig-3",
+                        "name": "MICRO_FLAC_MEMORY_PREFERENCE",
+                        "title": "Memory allocation preference",
+                        "type": "choice"
+                    },
+                    {
+                        "children": [],
+                        "depends_on": null,
+                        "help": "Enable Xtensa assembly optimizations for LPC prediction\nrestoration.\n\nUses MULL/MULSH and hardware loop instructions on ESP32 and\nESP32-S3 for significantly faster decoding. Only available\non Xtensa-based targets.",
+                        "id": "MICRO_FLAC_ENABLE_XTENSA_ASM",
+                        "name": "MICRO_FLAC_ENABLE_XTENSA_ASM",
+                        "range": null,
+                        "title": "Enable Xtensa assembly optimizations",
+                        "type": "bool"
+                    },
+                    {
+                        "children": [],
+                        "depends_on": null,
+                        "help": "Enable support for Ogg FLAC container format (.oga/.ogg files).\n\nWhen disabled, only native FLAC files are supported, saving\napproximately 3-5 KB of flash and eliminating the OggDemuxer\nheap allocation. Disable this if you only need native FLAC\ndecoding.",
+                        "id": "MICRO_FLAC_ENABLE_OGG",
+                        "name": "MICRO_FLAC_ENABLE_OGG",
+                        "range": null,
+                        "title": "Enable Ogg FLAC container support",
+                        "type": "bool"
+                    }
+                ],
+                "depends_on": null,
+                "id": "component-config-microflac-decoder-C:-Projects-MAE1-proj-components-micro-flac-Kconfig-1",
+                "title": "microFLAC Decoder",
+                "type": "menu"
+            },
+            {
                 "children": [],
                 "depends_on": "\"${IDF_BUILD_V2}\"",
                 "id": "component-config-configuration-for-components-not-included-in-the-build-C:-esp-v6.0.1-esp-idf-Kconfig-744",

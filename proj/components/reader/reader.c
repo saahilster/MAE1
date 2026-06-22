@@ -120,7 +120,7 @@ void list_trackslist(){
     }
 
     for(int i = 0; i < trackCount; i++){
-        printf("%s copied into playlists\n", tracks[i]);
+        printf("%s copied into playlists\n", trackList[i]);
     }
 }
 
@@ -153,6 +153,6 @@ void select_song(const char *song){
 }
 
 void run(){
-    list_tracklist();
+    list_trackslist();
     seek_track("/Disc 1");
 }

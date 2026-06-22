@@ -1,9 +1,9 @@
-set(CMAKE_HOST_SYSTEM "Windows-6.2.9200")
+set(CMAKE_HOST_SYSTEM "Windows-10.0.26200")
 set(CMAKE_HOST_SYSTEM_NAME "Windows")
-set(CMAKE_HOST_SYSTEM_VERSION "6.2.9200")
+set(CMAKE_HOST_SYSTEM_VERSION "10.0.26200")
 set(CMAKE_HOST_SYSTEM_PROCESSOR "AMD64")
 
-include("C:/PROJECTS/MAE1/proj/build/toolchain/toolchain-esp32s3.cmake")
+include("C:/Projects/MAE1/proj/build/toolchain/toolchain-esp32s3.cmake")
 
 set(CMAKE_SYSTEM "Generic")
 set(CMAKE_SYSTEM_NAME "Generic")

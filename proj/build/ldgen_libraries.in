@@ -209,3 +209,5 @@ $<TARGET_FILE:idf::reader>
 $<TARGET_FILE:__idf_fatfs>
 $<TARGET_FILE:idf::main>
 $<TARGET_FILE:__idf_reader>
+$<TARGET_FILE:idf::micro-flac>
+$<TARGET_FILE:micro_ogg_demuxer>
