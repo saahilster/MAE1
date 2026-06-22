@@ -1,3 +1,3 @@
-idf_component_register(SRCS "proj.c"
+idf_component_register(SRCS "proj.cpp"
                     INCLUDE_DIRS "."
                     REQUIRES reader)
