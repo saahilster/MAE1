@@ -29,8 +29,7 @@
 using namespace std;
 
 //For playlists
-char trackList[16][64];
-int trackCount = 0;
+vector<string> albumList(10);
 
 //For songs
 vector<string> songList(50);
@@ -80,7 +79,7 @@ void initialize(){
 
     esp_vfs_fat_mount_config_t mount_config = {};
 
-    mount_config.format_if_mount_failed = true;
+    mount_config.format_if_mount_failed = false;
     mount_config.max_files = 5;
     mount_config.allocation_unit_size = 16 * 1024;
     mount_config.disk_status_check_enable = false;
@@ -124,7 +123,7 @@ const char* path_finder(string albumName){
     return path.c_str();
 }
 
-void list_trackslist(){
+void register_trackslist(){
     DIR *dir = opendir(MOUNT_POINT);
     
     if (dir == NULL) {
@@ -133,31 +132,46 @@ void list_trackslist(){
     }
     struct dirent *entry;
 
-    while ((entry = readdir(dir)) != NULL){
-        if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0){
-            continue;
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || 
+            strcmp(entry->d_name, "..") == 0 || 
+            strcmp(entry->d_name, "System Volume Information") == 0){
+                continue;
         }
-        strcpy(trackList[trackCount], entry->d_name);
-        trackCount++;
-        
-        // printf("%s\n", entry->d_name);
+
+        albumList.push_back(entry->d_name); 
+        printf("%s added to albums!\n", entry->d_name);
     }
 
-    for(int i = 0; i < trackCount; i++){
-        printf("%s copied into playlists\n", trackList[i]);
+    for (int i = 0; i < albumList.size(); i++){
+        if(albumList[i].empty()){
+            albumList.erase(albumList.begin() + i);
+            i--;
+        }
+    }
+
+}
+
+void display_album_list(){
+    for (int i = 0; i < albumList.size(); i++){
+        printf("found %s\n", albumList[i].c_str());
     }
 }
 
+void display_queue(){
+    for (int i = 0; i < songList.size(); i++){
+        printf("found %s\n", songList[i].c_str());
+    }
+}
 //looks through album and lists all songs then adds to songlist vector.
-void seek_track(const char *trackName){
-    const char *path = path_finder(trackName);
+void seek_track(const char* albumName){
+    clear_songs();
+    printf("previous queue wiped.\n");
+    char path[256] = "/sdcard/";
+    strcat(path, albumName);
+    printf("\n\n//-----------// %s //-----------//\n\n", path);
 
     DIR *dir = opendir(path);
-    if (trackName == NULL){
-        printf("Track could not be found");
-        return;
-    }
-
     struct dirent *entry;
 
     while ((entry = readdir(dir)) != NULL){
@@ -166,7 +180,6 @@ void seek_track(const char *trackName){
         }
         string songName = entry->d_name;
         songList.push_back(songName);
-        printf("%s\n added to queue", songName.c_str()); 
     }
 }
 
@@ -175,12 +188,26 @@ void clear_songs(void){
     songList.clear();
 }
 
-void select_song(const char *song){
+FILE* select_song(string song, string album){
+    string albumPath = path_finder(album);
+    const char* filePath = (album + "/" + song).c_str();
 
+    FILE* file = fopen(filePath, "rb");
+    if (file == NULL){
+        printf("Could not find %s\n", filePath);
+    }
+    printf("found %s ", song.c_str());
+    printf("at location: %s", filePath);
+    return file;
 }
 
 void run(){
-    list_trackslist();
+    register_trackslist();
     //Test out
-    seek_track("Disc 1");
+    printf("albums: %d\n", albumList.size());
+    display_album_list();
+    seek_track(albumList[0].c_str());
+    display_queue();
+    seek_track(albumList[1].c_str());
+    display_queue();
 }
