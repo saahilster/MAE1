@@ -12,6 +12,11 @@ void initialize(void);
  */
 void register_trackslist(void);
 
+/**
+ * This function will update the path so that the songs can be read from the directory
+ * @param path path to the directory.
+ */
+void update_selected_album(char path[255]);
 
 void display_album_list(void);
 void display_queue(void);
@@ -33,6 +38,9 @@ void clear_songs(void);
 
 
 
-//I need a way to send this as a file to then send to get decoded.
-//This will return as a file for song that will get decoded.
-FILE* select_song(std::string song, std::string album);
+/**
+ * This function will be used to return the file of the song that will be decoded
+ * @param song a string of the filepath to the targeted FLAC file that will be decoded.
+ * Avoid hard coding the song in and use songList[i] for desired FLAC file.
+ */
+FILE* select_song(std::string song);

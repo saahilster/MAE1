@@ -30,9 +30,12 @@ using namespace std;
 
 //For playlists
 vector<string> albumList(10);
+char albumPath[255] = "";
 
 //For songs
 vector<string> songList(50);
+
+
 
 //Function will initialize SPI bus along with SDSPI.
 void initialize(){
@@ -163,12 +166,19 @@ void display_queue(){
         printf("found %s\n", songList[i].c_str());
     }
 }
+
+void update_selected_album(char path[255]){
+    strcpy(albumPath, path);
+    printf("\nalbum path: %s\n", albumPath);
+}
+
 //looks through album and lists all songs then adds to songlist vector.
 void seek_track(const char* albumName){
     clear_songs();
     printf("previous queue wiped.\n");
-    char path[256] = "/sdcard/";
+    char path[255] = "/sdcard/";
     strcat(path, albumName);
+    update_selected_album(path);
     printf("\n\n//-----------// %s //-----------//\n\n", path);
 
     DIR *dir = opendir(path);
@@ -188,16 +198,23 @@ void clear_songs(void){
     songList.clear();
 }
 
-FILE* select_song(string song, string album){
-    string albumPath = path_finder(album);
-    const char* filePath = (album + "/" + song).c_str();
+FILE* select_song(string song){
+    const char* songName = song.c_str();
+    char path[255] = "";
+    strcpy(path, albumPath);
+    printf("\nalbum path: %s\n", path);
+    strcat(path, "/");
+    strcat(path, songName);
 
-    FILE* file = fopen(filePath, "rb");
+    printf("\nsong path: %s\n", path);
+
+    FILE* file = fopen(path, "rb");
     if (file == NULL){
-        printf("Could not find %s\n", filePath);
+        printf("Could not find %s\n\n", path);
+        return NULL;
     }
-    printf("found %s ", song.c_str());
-    printf("at location: %s", filePath);
+    printf("found %s\n", song.c_str());
+    printf("at location: %s\n", path);
     return file;
 }
 
@@ -210,4 +227,12 @@ void run(){
     display_queue();
     seek_track(albumList[1].c_str());
     display_queue();
+    FILE *testFile =  select_song(songList[0]);
+    
+    if (testFile == nullptr){
+        printf("test file could not be found.");
+        return;
+    }
+
+    printf("test file found.");
 }
