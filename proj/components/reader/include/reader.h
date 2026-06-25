@@ -39,8 +39,8 @@ void clear_songs(void);
 
 
 /**
- * This function will be used to return the file of the song that will be decoded
+ * This function will be used to return the path of the song that will be decoded
  * @param song a string of the filepath to the targeted FLAC file that will be decoded.
  * Avoid hard coding the song in and use songList[i] for desired FLAC file.
  */
-FILE* select_song(std::string song);
+const char* select_song(std::string song);

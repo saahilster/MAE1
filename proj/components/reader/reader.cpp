@@ -198,24 +198,15 @@ void clear_songs(void){
     songList.clear();
 }
 
-FILE* select_song(string song){
+const char* select_song(string song){
     const char* songName = song.c_str();
     char path[255] = "";
     strcpy(path, albumPath);
     printf("\nalbum path: %s\n", path);
     strcat(path, "/");
     strcat(path, songName);
-
-    printf("\nsong path: %s\n", path);
-
-    FILE* file = fopen(path, "rb");
-    if (file == NULL){
-        printf("Could not find %s\n\n", path);
-        return NULL;
-    }
-    printf("found %s\n", song.c_str());
-    printf("at location: %s\n", path);
-    return file;
+    const char* finalPath = path;
+    return finalPath;
 }
 
 void run(){
@@ -227,12 +218,12 @@ void run(){
     display_queue();
     seek_track(albumList[1].c_str());
     display_queue();
-    FILE *testFile =  select_song(songList[0]);
+    const char* testSong=  select_song(songList[0]);
     
-    if (testFile == nullptr){
-        printf("test file could not be found.");
+    if (testSong == NULL){
+        printf("test song could not be found.");
         return;
     }
 
-    printf("test file found.");
+    printf("test song found.");
 }
