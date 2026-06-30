@@ -6,4 +6,6 @@
  * hard code song decoding for now.
  */
 
- void decode_song(const char* file);
+void decode_song(const char* file);
+void refill();
+void consume();
