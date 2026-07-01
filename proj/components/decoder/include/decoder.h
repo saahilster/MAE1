@@ -7,5 +7,14 @@
  */
 
 void decode_song(const char* file);
-void refill();
-void consume();
+
+/// @brief This function focuses on refilling the data after there are about 124 bytes left to decode
+/// Make the left over data be pushed to the front.
+/// @param dataToFill 
+void refill(size_t dataToFill);
+
+
+/// @brief This function focuses on the data being subtracted after decoding 
+/// @param data the data length that is being subtracted from
+/// @param bites the amount of bytes consumed while decoding.
+void consume(size_t data, size_t bites);
