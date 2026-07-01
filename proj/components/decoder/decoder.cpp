@@ -1,81 +1,121 @@
 #include <stdio.h>
 #include "decoder.h"
 #include <stdbool.h>
+#include <cstring>
 #include "esp_heap_caps.h"
 #include "micro_flac/flac_decoder.h"
 
 using namespace micro_flac;
+
 FLACDecoder dec;
+
 const size_t buffer_size = 4 * 1024 * 1024;
-size_t valid_bytes;
-size_t readBytes;
-size_t freeBytes = 0;
 
-void decode_song(const char* filePath){
-    FILE* f = fopen64(filePath, "rb");
+void decode_song(const char* filePath) {
+    FILE* f = fopen(filePath, "rb");
+    if (!f) {
+        printf("failed to open file\n");
+        return;
+    }
 
-    uint8_t* buffer = (uint8_t*)heap_caps_malloc(input_len, MALLOC_CAP_SPIRAM);
-    
-    //initial read of buffer_size = 1 MiB
-    readBytes = fread(buffer, 1, buffer_size, f);
-    valid_bytes = readBytes;
+    uint8_t* buffer = (uint8_t*)heap_caps_malloc(buffer_size, MALLOC_CAP_SPIRAM);
+    if (!buffer) {
+        printf("failed to allocate input buffer\n");
+        fclose(f);
+        return;
+    }
+
+    // Initial read of buffer_size = 4 MiB
+    size_t readBytes = fread(buffer, 1, buffer_size, f);
+    size_t validBytes = readBytes;
 
     uint8_t* output = nullptr;
     size_t outputSizeBytes = 0;
-    bool can_read = true;
 
-    //function to decode song
-    while(can_read == true || valid_bytes > 0){
+    bool can_read = true;
+    bool done = false;
+
+    while (!done && (can_read || validBytes > 0)) {
         size_t bytesConsumed = 0;
         size_t samplesDecoded = 0;
 
-        auto result = dec.decode(buffer,
-            valid_bytes,
+        auto result = dec.decode(
+            buffer,
+            validBytes,
             output,
             outputSizeBytes,
             bytesConsumed,
-            samplesDecoded );
-        
+            samplesDecoded
+        );
 
-        if(bytesConsumed > valid_bytes){
-            printf("Error more bytes consumed than data given.");
-            break;
-        }
-        size_t left_over_bytes = valid_bytes - bytesConsumed;
+        // Consume input bytes.
+        validBytes -= bytesConsumed;
+        size_t leftOver = validBytes;
 
-        if(valid_bytes == 0 && bytesConsumed == 0){
-            //stop process
-            can_read = false;
-            break;
+        // Because the next decode call starts at buffer,
+        // move the leftover bytes to the front.
+        if (leftOver > 0 && bytesConsumed > 0) {
+            memmove(buffer, buffer + bytesConsumed, leftOver);
         }
 
-        //refills buffer by moving the left over bytes to the front
-        if(valid_bytes > 0 && bytesConsumed > 0){
-            memmove(buffer, buffer + bytesConsumed, left_over_bytes);
+        if (result == FLAC_DECODER_HEADER_READY) {
+            const auto& info = dec.get_stream_info();
+
+            outputSizeBytes =
+                info.max_block_size() *
+                info.num_channels() *
+                info.bytes_per_sample();
+
+            if (!output) {
+                output = (uint8_t*)heap_caps_malloc(outputSizeBytes, MALLOC_CAP_SPIRAM);
+
+                if (!output) {
+                    printf("failed to allocate output buffer\n");
+                    done = true;
+                }
+            }
         }
-        //valid bytes are now equal to the left overs to continue decoding.
-        valid_bytes = left_over_bytes;
-        freeBytes = buffer_size - valid_bytes;
-        
-        if(can_read){
-            //now we need to read the amount left
-            readBytes = fread(buffer + valid_bytes, 1, freeBytes, f);
+        else if (result == FLAC_DECODER_SUCCESS) {
+            // PROCESS PCM HERE LATER
+            // output contains decoded audio
+            // samplesDecoded tells you how many samples are valid
         }
-        
-        valid_bytes = valid_bytes + readBytes;
+        else if (result == FLAC_DECODER_NEED_MORE_DATA) {
+            if (can_read) {
+                size_t freeSpace = buffer_size - leftOver;
+
+                if (freeSpace > 0) {
+                    readBytes = fread(buffer + leftOver, 1, freeSpace, f);
+                    validBytes = leftOver + readBytes;
+
+                    if (readBytes == 0) {
+                        can_read = false;
+                    }
+                } else {
+                    printf("decoder needs more data but input buffer is full\n");
+                    done = true;
+                }
+            }
+
+            if (bytesConsumed == 0 && !can_read) {
+                printf("file exhausted before decoder finished\n");
+                done = true;
+            }
+        }
+        else if (result == FLAC_DECODER_END_OF_STREAM) {
+            printf("end of stream\n");
+            done = true;
+        }
+        else {
+            printf("decoder error occurred\n");
+            done = true;
+        }
     }
+
+    if (output) {
+        heap_caps_free(output);
+    }
+
+    heap_caps_free(buffer);
     fclose(f);
-}
-
-void refill(size_t data_length){
-    
-}
-
-void consume(size_t data, size_t bites){
-    data -= bites;
-    printf(data);
-
-    if(data < 124){
-        refill()
-    }
 }
