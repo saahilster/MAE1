@@ -4,6 +4,7 @@
 #include <cstring>
 #include "esp_heap_caps.h"
 #include "micro_flac/flac_decoder.h"
+#include <inttypes.h>
 
 using namespace micro_flac;
 
@@ -21,7 +22,7 @@ void decode_song(const char *filePath)
     }
     printf("file was found and opened\n");
 
-    uint8_t *buffer = (uint8_t*)heap_caps_malloc(buffer_size, MALLOC_CAP_SPIRAM);
+    uint8_t *buffer = (uint8_t *)heap_caps_malloc(buffer_size, MALLOC_CAP_SPIRAM);
     if (!buffer)
     {
         printf("failed to allocate input buffer\n");
@@ -55,27 +56,32 @@ void decode_song(const char *filePath)
         // Consume input bytes.
         validBytes -= bytesConsumed;
         size_t leftOver = validBytes;
+        printf("Bytes Consumed: %zu\n", bytesConsumed);
+        printf("Data left: %zu\n", leftOver);
 
         // Because the next decode call starts at buffer,
         // move the leftover bytes to the front.
         if (leftOver > 0 && bytesConsumed > 0)
         {
+            printf("Updating Consumtion\n");
             memmove(buffer, buffer + bytesConsumed, leftOver);
+            printf("buffer[0..7] = %02X %02X %02X %02X %02X %02X %02X %02X\n",
+                   (unsigned char)buffer[0], (unsigned char)buffer[1], (unsigned char)buffer[2], (unsigned char)buffer[3],
+                   (unsigned char)buffer[4], (unsigned char)buffer[5], (unsigned char)buffer[6], (unsigned char)buffer[7]);
         }
 
         if (result == FLAC_DECODER_HEADER_READY)
         {
-            outputSizeSamples = dec.get_output_buffer_size_samples(); 
+            printf("Header Ready\n");
+            outputSizeSamples = dec.get_output_buffer_size_samples();
+
+            printf("Updating output\n");
+            output = (int32_t *)heap_caps_malloc(outputSizeSamples * sizeof(int32_t), MALLOC_CAP_SPIRAM);
 
             if (!output)
             {
-                output = (int32_t *)heap_caps_malloc(outputSizeSamples * sizeof(int32_t), MALLOC_CAP_SPIRAM);
-
-                if (!output)
-                {
-                    printf("failed to allocate output buffer\n");
-                    done = true;
-                }
+                printf("failed to allocate output buffer\n");
+                done = true;
             }
         }
         else if (result == FLAC_DECODER_SUCCESS)
@@ -84,12 +90,14 @@ void decode_song(const char *filePath)
             // output contains decoded audio
             // samplesDecoded tells you how many samples are valid
 
-            //Test out if it prints.
+            // Test out if it prints.
             size_t pcmChunk = samplesDecoded * outputSizeSamples;
             printf("\nChunk: %zu\n", pcmChunk);
+            printf("Sample Data: %ld\n", (long)output);
         }
         else if (result == FLAC_DECODER_NEED_MORE_DATA)
         {
+            printf("Attempting to refill data");
             if (can_read)
             {
                 size_t freeSpace = buffer_size - leftOver;
