@@ -5,6 +5,7 @@
 #include "esp_heap_caps.h"
 #include "micro_flac/flac_decoder.h"
 #include <inttypes.h>
+#include "freertos/FreeRTOS.h"
 
 using namespace micro_flac;
 
@@ -14,6 +15,7 @@ size_t buffer_size = 4 * 1024 * 1024;
 
 void decode_song(const char *filePath)
 {
+    vTaskDelay(10);
     FILE *f = fopen(filePath, "rb");
     if (f == NULL)
     {
