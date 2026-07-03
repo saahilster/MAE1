@@ -17,6 +17,7 @@
 #include "dirent.h"
 #include <string>
 #include <vector>
+#include "decoder.h"
 
 #define MOUNT_POINT "/sdcard"
 
@@ -34,6 +35,7 @@ char albumPath[255] = "";
 
 //For songs
 vector<string> songList(50);
+string selectedSong;
 
 
 
@@ -141,9 +143,11 @@ void register_trackslist(){
             strcmp(entry->d_name, "System Volume Information") == 0){
                 continue;
         }
-
-        albumList.push_back(entry->d_name); 
-        printf("%s added to albums!\n", entry->d_name);
+        string albumName = entry->d_name;
+        string mount = "/sdcard/";
+        string albumPath = (mount + albumName);
+        albumList.push_back(albumPath); 
+        printf("%s added to albums!\n", albumPath.c_str());
     }
 
     for (int i = 0; i < albumList.size(); i++){
@@ -167,8 +171,8 @@ void display_queue(){
     }
 }
 
-void update_selected_album(char path[255]){
-    strcpy(albumPath, path);
+void update_selected_album(string path){
+    strcpy(albumPath, path.c_str());
     printf("\nalbum path: %s\n", albumPath);
 }
 
@@ -176,7 +180,7 @@ void update_selected_album(char path[255]){
 void seek_track(const char* albumName){
     clear_songs();
     printf("previous queue wiped.\n");
-    char path[255] = "/sdcard/";
+    char path[255] = "";
     strcat(path, albumName);
     update_selected_album(path);
     printf("\n\n//-----------// %s //-----------//\n\n", path);
@@ -198,14 +202,18 @@ void clear_songs(void){
     songList.clear();
 }
 
-const char* select_song(string song){
-    const char* songName = song.c_str();
-    char path[255] = "";
-    strcpy(path, albumPath);
-    printf("\nalbum path: %s\n", path);
-    strcat(path, "/");
-    strcat(path, songName);
-    const char* finalPath = path;
+string select_song(string song){
+    // const char* songName = song.c_str();
+    // char path[255] = "";
+    // strcpy(path, albumPath);
+    // printf("\nalbum path: %s\n", path);
+    // strcat(path, "/");
+    // strcat(path, songName);
+    // const char* finalPath = path;
+    // printf("\nFinal Path: %s\n", finalPath);
+    // return finalPath;
+    string slash = "/";
+    string finalPath = (albumPath + slash + song);
     return finalPath;
 }
 
@@ -218,12 +226,11 @@ void run(){
     display_queue();
     seek_track(albumList[1].c_str());
     display_queue();
-    const char* testSong=  select_song(songList[0]);
-    
-    if (testSong == NULL){
-        printf("test song could not be found.");
-        return;
-    }
+    update_selected_album(albumList[1]);
 
-    printf("test song found.");
+    selectedSong = select_song(songList[24]);
+    printf("\n Test Song: %s\n", selectedSong.c_str());
+    
+    printf("test song found\n%s\n\n", selectedSong.c_str());
+    decode_song(selectedSong.c_str());
 }

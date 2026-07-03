@@ -16,7 +16,7 @@ void register_trackslist(void);
  * This function will update the path so that the songs can be read from the directory
  * @param path path to the directory.
  */
-void update_selected_album(char path[255]);
+void update_selected_album(std::string path);
 
 void display_album_list(void);
 void display_queue(void);
@@ -43,4 +43,4 @@ void clear_songs(void);
  * @param song a string of the filepath to the targeted FLAC file that will be decoded.
  * Avoid hard coding the song in and use songList[i] for desired FLAC file.
  */
-const char* select_song(std::string song);
+std::string select_song(std::string song);

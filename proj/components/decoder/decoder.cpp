@@ -9,18 +9,19 @@ using namespace micro_flac;
 
 FLACDecoder dec;
 
-const size_t buffer_size = 4 * 1024 * 1024;
+size_t buffer_size = 4 * 1024 * 1024;
 
 void decode_song(const char *filePath)
 {
     FILE *f = fopen(filePath, "rb");
-    if (!f)
+    if (f == NULL)
     {
         printf("failed to open file\n");
         return;
     }
+    printf("file was found and opened\n");
 
-    uint8_t *buffer = (uint8_t *)heap_caps_malloc(buffer_size, MALLOC_CAP_SPIRAM);
+    uint8_t *buffer = (uint8_t*)heap_caps_malloc(buffer_size, MALLOC_CAP_SPIRAM);
     if (!buffer)
     {
         printf("failed to allocate input buffer\n");
@@ -85,7 +86,7 @@ void decode_song(const char *filePath)
 
             //Test out if it prints.
             size_t pcmChunk = samplesDecoded * outputSizeSamples;
-            printf("\n%zu\n", pcmChunk);
+            printf("\nChunk: %zu\n", pcmChunk);
         }
         else if (result == FLAC_DECODER_NEED_MORE_DATA)
         {
