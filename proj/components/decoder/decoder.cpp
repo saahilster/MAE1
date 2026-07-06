@@ -15,6 +15,8 @@ size_t buffer_size = 4 * 1024 * 1024;
 
 void decode_song(const char *filePath)
 {
+    //Work on figuring out the watch dog error
+    //Look into FreeRTOS.
     vTaskDelay(10);
     FILE *f = fopen(filePath, "rb");
     if (f == NULL)
