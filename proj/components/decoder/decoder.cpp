@@ -11,7 +11,7 @@ using namespace micro_flac;
 
 FLACDecoder dec;
 
-size_t buffer_size = 4 * 1024 * 1024;
+size_t buffer_size = 1024 * 64;
 
 void decode_song(const char *filePath)
 {
