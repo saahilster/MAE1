@@ -18,8 +18,7 @@
 //i2s transmitter
 static i2s_chan_handle_t tx_chan;
 
-
-void func(void)
+void transmit(void)
 {
 
 }
