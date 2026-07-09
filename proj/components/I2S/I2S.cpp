@@ -4,14 +4,16 @@
 #include "driver/gpio.h"
 #include "driver/i2s_std.h"
 #include "esp_check.h"
+#include "esp_err.h"
+#include "esp_log.h"
 
 // TODO define these
 #define DUPLEX_MODE
-#define WS 0
-#define BCLK 0
-#define MCLK 0
-#define DIN 0
-#define DOUT 0
+#define WS GPIO_NUM_1
+#define BCLK GPIO_NUM_1
+#define MCLK GPIO_NUM_1
+#define DIN GPIO_NUM_1
+#define DOUT GPIO_NUM_1
 
 // 32 kb
 #define BUFF_SIZE 32768
@@ -25,18 +27,15 @@ size_t bytes_read;
 
 void initialize_bus()
 {
+    static const char *TAG = "I2S";
     esp_err_t error;
 
-    error = i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
-    if(error != ESP_OK){
-        ESP_LOGE(TAG, "channel cfg failure: %s\n", esp_err_to_name(error));
-        return error;
-    }
+    i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
 
     error = i2s_new_channel(&chan_cfg, &tx_handle, NULL);
     if(error != ESP_OK){
         ESP_LOGE(TAG, "New channel creation failure: %s\n", esp_err_to_name(error));
-        return error;
+        return;
     }
 
     i2s_std_config_t std_cfg = {
@@ -59,17 +58,17 @@ void initialize_bus()
     error = i2s_channel_init_std_mode(tx_handle, &std_cfg);
     if(error != ESP_OK){
         ESP_LOGE(TAG, "channel std initialization failure: %s\n", esp_err_to_name(error));
-        return error;
+        return;
     }
     error = i2s_channel_enable(tx_handle);
     if(error != ESP_OK){
         ESP_LOGE(TAG, "channel enabling failure: %s\n", esp_err_to_name(error));
-        return error;
+        return;
     }
     printf("I2S bus successfully initialized\n");
 }
 
-void transmit(int32_t input)
-{
-    i2s_channel_write(tx_handle, input, buff_size, bytes_read, 1000);
-}
+// void transmit(int32_t input)
+// {
+//     i2s_channel_write(tx_handle, input, buff_size, bytes_read, 1000);
+// }
