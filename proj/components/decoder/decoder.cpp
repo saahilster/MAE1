@@ -12,11 +12,13 @@ using namespace micro_flac;
 FLACDecoder dec;
 
 size_t buffer_size = 1024 * 64;
+size_t outputSizeSamples = 0;
+int32_t *output = nullptr;
 
 void decode_song(const char *filePath)
 {
-    //Work on figuring out the watch dog error
-    //Look into FreeRTOS.
+    // Work on figuring out the watch dog error
+    // Look into FreeRTOS.
     vTaskDelay(10);
     FILE *f = fopen(filePath, "rb");
     if (f == NULL)
@@ -37,9 +39,6 @@ void decode_song(const char *filePath)
     // Initial read of buffer_size = 4 MiB
     size_t readBytes = fread(buffer, 1, buffer_size, f);
     size_t validBytes = readBytes;
-
-    size_t outputSizeSamples = 0;
-    int32_t *output = nullptr;
 
     bool can_read = true;
     bool done = false;
