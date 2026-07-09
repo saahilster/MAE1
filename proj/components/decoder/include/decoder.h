@@ -6,4 +6,4 @@
  * hard code song decoding for now.
  */
 
-void decode_song(const char* file);
+int32_t* decode_song(const char* file);

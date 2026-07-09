@@ -1,2 +1,2 @@
-void transmit(int32_t input);
+void transmit(const void* input);
 void initialize_bus(void);
