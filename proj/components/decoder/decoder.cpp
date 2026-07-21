@@ -15,7 +15,7 @@ size_t buffer_size = 1024 * 64;
 size_t outputSizeSamples = 0;
 int32_t *output = nullptr;
 
-int32_t* decode_song(const char *filePath)
+void decode_song(const char *filePath)
 {
     // Work on figuring out the watch dog error
     // Look into FreeRTOS.
@@ -25,7 +25,7 @@ int32_t* decode_song(const char *filePath)
     {
         printf("failed to open file\n");
         return 0;
-    }
+    }   
     printf("file was found and opened\n");
 
     uint8_t *buffer = (uint8_t *)heap_caps_malloc(buffer_size, MALLOC_CAP_SPIRAM);
