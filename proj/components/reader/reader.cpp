@@ -222,15 +222,15 @@ void run(){
     //Test out
     printf("albums: %d\n", albumList.size());
     display_album_list();
-    // seek_track(albumList[0].c_str());
-    // display_queue();
-    // seek_track(albumList[1].c_str());
-    // display_queue();
-    // update_selected_album(albumList[1]);
+    seek_track(albumList[0].c_str());
+    display_queue();
+    seek_track(albumList[1].c_str());
+    display_queue();
+    update_selected_album(albumList[1]);
 
-    // selectedSong = select_song(songList[24]);
-    // printf("\n Test Song: %s\n", selectedSong.c_str());
+    selectedSong = select_song(songList[24]);
+    printf("\n Test Song: %s\n", selectedSong.c_str());
     
-    // printf("test song found\n%s\n\n", selectedSong.c_str());
-    // decode_song(selectedSong.c_str());
+    printf("test song found\n%s\n\n", selectedSong.c_str());
+    decode_song(selectedSong.c_str());
 }

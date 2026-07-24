@@ -92,11 +92,14 @@ void decode_song(const char *filePath)
             // PROCESS PCM HERE LATER
             // output contains decoded audio
             // samplesDecoded tells you how many samples are valid
-
+    
             // Test out if it prints.
             size_t pcmChunk = samplesDecoded;
             printf("\nChunk: %zu\n", pcmChunk);
             printf("Sample Data: %ld\n", (long)output);
+
+            //test to see if it works
+            transmit(output);
         }
         else if (result == FLAC_DECODER_NEED_MORE_DATA)
         {
