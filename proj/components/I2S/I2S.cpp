@@ -9,18 +9,16 @@
 
 // TODO define these
 #define DUPLEX_MODE
-#define WS GPIO_NUM_1
-#define BCLK GPIO_NUM_1
-#define MCLK GPIO_NUM_1
-#define DOUT GPIO_NUM_1
-
+#define WS GPIO_NUM_40
+#define BCLK GPIO_NUM_42
+// #define MCLK GPIO_NUM_1
+#define DOUT GPIO_NUM_41
+    
 // 32 kb
 #define BUFF_SIZE 32768
 
 // i2s transmitter
 static i2s_chan_handle_t tx_handle;
-int32_t src_buff;
-size_t* bytes_read;
 
 void initialize_bus()
 {
@@ -62,10 +60,20 @@ void initialize_bus()
         ESP_LOGE(TAG, "channel enabling failure: %s\n", esp_err_to_name(error));
         return;
     }
-    printf("I2S bus successfully initialized\n");
+
+    ESP_LOGI(TAG,"I2S bus successfully initialized\n");
 }
 
-void transmit(const void* input)
+void transmit(const void* input, size_t bytes_read)
 {
-    i2s_channel_write(tx_handle, input, BUFF_SIZE, bytes_read, 1000);
+    static const char *TAG = "transmission";
+    esp_err_t error;
+    error = i2s_channel_write(tx_handle, input, BUFF_SIZE, &bytes_read, 1000);
+
+    if(error != ESP_OK){
+        ESP_LOGE(TAG, "transmission failure: %s\n", esp_err_to_name(error));
+        return;
+    }
+
+    ESP_LOGI(TAG, "transmission success");
 }

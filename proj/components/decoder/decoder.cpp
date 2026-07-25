@@ -6,13 +6,15 @@
 #include "micro_flac/flac_decoder.h"
 #include <inttypes.h>
 #include "freertos/FreeRTOS.h"
+#include "I2S.h"
+
 #include <math.h>
 
 using namespace micro_flac;
 
 FLACDecoder dec;
 
-size_t buffer_size = 1024 * 64;
+size_t buffer_size = 1024 * 32;
 size_t outputSizeSamples = 0;
 int32_t *output = nullptr;
 
@@ -100,7 +102,7 @@ void decode_song(const char *filePath)
             printf("Sample Data: %ld\n", (long)output);
 
             //test to see if it works
-            transmit(output);
+            transmit(apply_volume(*output, 0.5f), bytesConsumed);
         }
         else if (result == FLAC_DECODER_NEED_MORE_DATA)
         {
@@ -153,8 +155,8 @@ void decode_song(const char *filePath)
     fclose(f);
 }
 
-int32_t apply_volume(int32 rawSample, float gain){
-    long scale = lroundf( (float)rawSample * gain);
+int32_t apply_volume(int32_t rawSample, float gain){
+    long scale = lroundf((float)rawSample * gain);
 
     //clamp
     if(scale > INT32_MAX){

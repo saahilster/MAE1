@@ -18,7 +18,6 @@
 #include <string>
 #include <vector>
 #include "decoder.h"
-
 #define MOUNT_POINT "/sdcard"
 
 //SPI pins
