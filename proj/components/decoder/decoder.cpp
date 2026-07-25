@@ -6,6 +6,7 @@
 #include "micro_flac/flac_decoder.h"
 #include <inttypes.h>
 #include "freertos/FreeRTOS.h"
+#include <math.h>
 
 using namespace micro_flac;
 
@@ -150,4 +151,18 @@ void decode_song(const char *filePath)
 
     heap_caps_free(buffer);
     fclose(f);
+}
+
+int32_t apply_volume(int32 rawSample, float gain){
+    long scale = lroundf( (float)rawSample * gain);
+
+    //clamp
+    if(scale > INT32_MAX){
+        scale = INT32_MAX;
+    }
+    else if(scale < INT32_MIN){
+        scale = INT32_MIN;
+    }
+
+    return scale;
 }

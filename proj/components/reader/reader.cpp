@@ -203,15 +203,6 @@ void clear_songs(void){
 }
 
 string select_song(string song){
-    // const char* songName = song.c_str();
-    // char path[255] = "";
-    // strcpy(path, albumPath);
-    // printf("\nalbum path: %s\n", path);
-    // strcat(path, "/");
-    // strcat(path, songName);
-    // const char* finalPath = path;
-    // printf("\nFinal Path: %s\n", finalPath);
-    // return finalPath;
     string slash = "/";
     string finalPath = (albumPath + slash + song);
     return finalPath;

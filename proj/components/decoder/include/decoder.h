@@ -7,4 +7,6 @@
  */
 
 void decode_song(const char* file);
+
+int32_t apply_volume(int32_t rawSample);
     
