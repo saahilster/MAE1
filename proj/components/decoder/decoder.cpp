@@ -20,6 +20,8 @@ int32_t *output = nullptr;
 
 void decode_song(const char *filePath)
 {
+    output = nullptr;
+    outputSizeSamples = 0;
     dec.reset();
     // Work on figuring out the watch dog error
     // Look into FreeRTOS.
@@ -28,6 +30,7 @@ void decode_song(const char *filePath)
     if (f == NULL)
     {
         printf("failed to open file\n");
+        return;
     }   
     printf("file was found and opened\n");
 
@@ -36,6 +39,7 @@ void decode_song(const char *filePath)
     {
         printf("failed to allocate input buffer\n");
         fclose(f);
+        return;
     }
 
     // Initial read of buffer_size = 4 MiB
@@ -98,14 +102,13 @@ void decode_song(const char *filePath)
             printf("Sample Data: %ld\n", (long)output);
 
             //test to see if it works
-            int32_t adjustedSample = apply_volume(*output, 0.5f);
-            // transmit(&adjustedSample);
+           // transmit(&adjustedSample);
 
             for (size_t i = 0; i < samplesDecoded; i++){
-                output[i] = apply_volume(*output, 0.5f);
+                output[i] = apply_volume(output[i], 0.0005f);
             }
 
-            transmit(&output);
+            transmit(output, &samplesDecoded);
         }
         else if (result == FLAC_DECODER_NEED_MORE_DATA)
         {
@@ -168,6 +171,5 @@ int32_t apply_volume(int32_t rawSample, float gain){
     else if(scale < INT32_MIN){
         scale = INT32_MIN;
     }
-
     return scale;
 }

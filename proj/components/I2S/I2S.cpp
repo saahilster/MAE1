@@ -64,16 +64,26 @@ void initialize_bus()
     ESP_LOGI(TAG,"I2S bus successfully initialized\n");
 }
 
-void transmit(const void* input)
+void transmit(const void* input, size_t* samples)
 {
+    size_t bytesToWrite = samples * sizeof(int32_t);
+    size_t bytesWritten = 0;
+
     static const char *TAG = "transmission";
     esp_err_t error;
-    error = i2s_channel_write(tx_handle, input, BUFF_SIZE, NULL, 1000);
+    error = i2s_channel_write(tx_handle, input, bytesToWrite, &bytesWritten, 1000);
 
     if(error != ESP_OK){
         ESP_LOGE(TAG, "transmission failure: %s\n", esp_err_to_name(error));
         return;
     }
+
+    if (bytesWritten != bytesToWrite) {
+    printf(
+        "Partial I2S write: %zu of %zu bytes\n",
+        bytesWritten,
+        bytesToWrite
+    );
 
     ESP_LOGI(TAG, "transmission success");
 }
