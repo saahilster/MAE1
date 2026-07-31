@@ -13,7 +13,7 @@
 #define BCLK GPIO_NUM_42
 // #define MCLK GPIO_NUM_1
 #define DOUT GPIO_NUM_41
-    
+
 // 32 kb
 #define BUFF_SIZE 32768
 
@@ -28,14 +28,17 @@ void initialize_bus()
     i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
 
     error = i2s_new_channel(&chan_cfg, &tx_handle, NULL);
-    if(error != ESP_OK){
+    if (error != ESP_OK)
+    {
         ESP_LOGE(TAG, "New channel creation failure: %s\n", esp_err_to_name(error));
         return;
     }
 
     i2s_std_config_t std_cfg = {
         .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(48000),
-        .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_32BIT, I2S_SLOT_MODE_STEREO),
+        .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(
+            I2S_DATA_BIT_WIDTH_32BIT,
+            I2S_SLOT_MODE_STEREO),
         .gpio_cfg = {
             .mclk = I2S_GPIO_UNUSED,
             .bclk = BCLK,
@@ -51,20 +54,22 @@ void initialize_bus()
     };
 
     error = i2s_channel_init_std_mode(tx_handle, &std_cfg);
-    if(error != ESP_OK){
+    if (error != ESP_OK)
+    {
         ESP_LOGE(TAG, "channel std initialization failure: %s\n", esp_err_to_name(error));
         return;
     }
     error = i2s_channel_enable(tx_handle);
-    if(error != ESP_OK){
+    if (error != ESP_OK)
+    {
         ESP_LOGE(TAG, "channel enabling failure: %s\n", esp_err_to_name(error));
         return;
     }
 
-    ESP_LOGI(TAG,"I2S bus successfully initialized\n");
+    ESP_LOGI(TAG, "I2S bus successfully initialized\n");
 }
 
-void transmit(const void* input, size_t* samples)
+void transmit(const void *input, size_t samples)
 {
     size_t bytesToWrite = samples * sizeof(int32_t);
     size_t bytesWritten = 0;
@@ -73,17 +78,45 @@ void transmit(const void* input, size_t* samples)
     esp_err_t error;
     error = i2s_channel_write(tx_handle, input, bytesToWrite, &bytesWritten, 1000);
 
-    if(error != ESP_OK){
+    if (error != ESP_OK)
+    {
         ESP_LOGE(TAG, "transmission failure: %s\n", esp_err_to_name(error));
         return;
     }
 
-    if (bytesWritten != bytesToWrite) {
-    printf(
-        "Partial I2S write: %zu of %zu bytes\n",
-        bytesWritten,
-        bytesToWrite
-    );
+    if (bytesWritten != bytesToWrite)
+    {
+        printf(
+            "Partial I2S write: %zu of %zu bytes\n",
+            bytesWritten,
+            bytesToWrite);
 
-    ESP_LOGI(TAG, "transmission success");
+        ESP_LOGI(TAG, "transmission success");
+    }
+}
+
+void test_silence(){
+    static int32_t silence[512] = {0};
+
+    while (true){
+        size_t bytesWritten = 0;
+        esp_err_t err;
+        err = i2s_channel_write(
+            tx_handle,
+            silence,
+            sizeof(silence),
+            &bytesWritten,
+            portMAX_DELAY
+        );
+
+        if(err != ESP_OK){
+            printf("Silence failed");
+            break;
+        }
+    }
+    
+}
+
+void test_sin(){
+
 }

@@ -9,6 +9,7 @@
 extern "C" void app_main(void)
 {
     initialize_bus();
-    initialize();
-    run();
+    // initialize();
+    // run();
+    test_silence();
 }

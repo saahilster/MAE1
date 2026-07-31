@@ -85,6 +85,11 @@ void decode_song(const char *filePath)
             printf("Header Ready\n");
             outputSizeSamples = dec.get_output_buffer_size_samples();
 
+            if(output != nullptr){
+                heap_caps_free(output);
+                output = nullptr;
+                outputSizeSamples = 0;
+            }
             printf("Updating output\n");
             output = (int32_t *)heap_caps_malloc(outputSizeSamples * sizeof(int32_t), MALLOC_CAP_SPIRAM);
 
@@ -105,10 +110,10 @@ void decode_song(const char *filePath)
            // transmit(&adjustedSample);
 
             for (size_t i = 0; i < samplesDecoded; i++){
-                output[i] = apply_volume(output[i], 0.0005f);
+                output[i] = apply_volume(output[i], 0.000f);
             }
 
-            transmit(output, &samplesDecoded);
+            transmit(output, samplesDecoded);
         }
         else if (result == FLAC_DECODER_NEED_MORE_DATA)
         {
